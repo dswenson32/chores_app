@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+</style>
+</head>
+<body>
+
+<div class="row">
+  <div class="column">
+      <table border = "2">
+	<tbody>
+		<tr>
+			<td>Daily </td>
+			<td>Complete </td>
+		</tr>
+        {% for chore in chores %}
+            {% if chore['frequency'] == 'd' %}
+            <tr>
+                <td>{{ chore['chore_name'] }} </td>
+                <td><input type="checkbox"/> </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+	</tbody>
+</table>
+  </div>
+    <div class="column">
+        <table border = "2">
+	<tbody>
+		<tr>
+			<td>Weekly </td>
+			<td>Complete </td>
+		</tr>
+        {% for chore in chores %}
+            {% if chore['frequency'] == 'w' %}
+            <tr>
+                <td>{{ chore['chore_name'] }} </td>
+                <td><input type="checkbox"/> </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+	</tbody>
+</table>
+  </div>
+</div>
+
+
+</body>
+</html>
