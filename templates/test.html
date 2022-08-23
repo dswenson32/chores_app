@@ -15,7 +15,7 @@
 
 .column {
   float: left;
-  width: 50%;
+  width: 33%;
   padding: 5px;
 }
 
@@ -38,8 +38,8 @@ th, td {
   padding: 16px;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
+.header {
+    background-color: darkgray;
 }
 </style>
 </head>
@@ -49,13 +49,13 @@ tr:nth-child(even) {
   <div class="column">
       <table border = "2">
 	<tbody>
-		<tr>
+		<tr class="header">
 			<td>Daily </td>
 			<td>Complete </td>
 		</tr>
         {% for chore in chores|sort(attribute='last_performed') %}
             {% if chore['frequency'] == 'd' %}
-            <tr>
+            <tr class="daily-rows" data-timestamp="{{ chore['last_performed'] }}">
                 <td>{{ chore['chore_name'] }} </td>
                 <td><input type="button" class="completed-btn" id="{{ chore['id'] }}" value="Done"/> </td>
             </tr>
@@ -67,13 +67,31 @@ tr:nth-child(even) {
     <div class="column">
         <table border = "2">
 	<tbody>
-		<tr>
+		<tr class="header">
 			<td>Weekly </td>
 			<td>Complete </td>
 		</tr>
         {% for chore in chores|sort(attribute='last_performed') %}
             {% if chore['frequency'] == 'w' %}
-            <tr>
+            <tr class="weekly-rows" data-timestamp="{{ chore['last_performed'] }}">
+                <td>{{ chore['chore_name'] }} </td>
+                <td><input type="button" class="completed-btn" id="{{ chore['id'] }}" value="Done"/> </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+	</tbody>
+</table>
+  </div>
+    <div class="column">
+        <table border = "2">
+	<tbody>
+		<tr class="header">
+			<td>Monthly </td>
+			<td>Complete </td>
+		</tr>
+        {% for chore in chores|sort(attribute='last_performed') %}
+            {% if chore['frequency'] == 'm' %}
+            <tr class="monthly-rows" data-timestamp="{{ chore['last_performed'] }}">
                 <td>{{ chore['chore_name'] }} </td>
                 <td><input type="button" class="completed-btn" id="{{ chore['id'] }}" value="Done"/> </td>
             </tr>
@@ -88,8 +106,68 @@ tr:nth-child(even) {
 </body>
 
 <script>
-    const complete_buttons = document.querySelectorAll('.completed-btn');
+    const hour_in_milli = 3600000;
+    const day_in_milli = 86400000;
 
+    // Daily row
+    // < 12 hrs - Green
+    // 12 - 24 hrs - White
+    // 24 - 48 - Yellow
+    // 48+ - Red
+    const dailyRows = document.querySelectorAll('.daily-rows');
+    dailyRows.forEach( row => {
+        let diffTime = Date.now() - row.dataset.timestamp
+        if(diffTime < (hour_in_milli * 12)){
+            row.style['background-color'] = "green"
+        } else if(diffTime >= (hour_in_milli * 12) && diffTime < (hour_in_milli * 24)) {
+            row.style['background-color'] = "white"
+        } else if(diffTime >= (hour_in_milli * 24) && diffTime < (hour_in_milli * 48)){
+            row.style['background-color'] = "yellow"
+        } else {
+            row.style['background-color'] = "red"
+        }
+    });
+
+
+    // Weekly row
+    // < 7 days - green
+    // 7 - 14 days - white
+    // 14 - 18 days - yellow
+    // 18+ days = red
+    const weeklyRows = document.querySelectorAll('.weekly-rows');
+    weeklyRows.forEach( row => {
+        let diffTime = Date.now() - row.dataset.timestamp
+        if(diffTime < (day_in_milli * 7)){
+            row.style['background-color'] = "green"
+        } else if(diffTime >= (day_in_milli * 7) && diffTime < (day_in_milli * 14)) {
+            row.style['background-color'] = "white"
+        } else if(diffTime >= (day_in_milli * 14) && diffTime < (hour_in_milli * 18)){
+            row.style['background-color'] = "yellow"
+        } else {
+            row.style['background-color'] = "red"
+        }
+    });
+
+    // Monthly row
+    // < 30 days - green
+    // 30 - 60 days - white
+    // 60 - 75 days - yellow
+    // 75+ days = red
+    const monthlyRows = document.querySelectorAll('.monthly-rows');
+    monthlyRows.forEach( row => {
+        let diffTime = Date.now() - row.dataset.timestamp
+        if(diffTime < (day_in_milli * 30)){
+            row.style['background-color'] = "green"
+        } else if(diffTime >= (day_in_milli * 30) && diffTime < (day_in_milli * 60)) {
+            row.style['background-color'] = "white"
+        } else if(diffTime >= (day_in_milli * 60) && diffTime < (hour_in_milli * 75)){
+            row.style['background-color'] = "yellow"
+        } else {
+            row.style['background-color'] = "red"
+        }
+    });
+
+    const complete_buttons = document.querySelectorAll('.completed-btn');
     complete_buttons.forEach( complete_button => {
       complete_button.addEventListener('click', function handleClick(event) {
         console.log('box clicked', event);
@@ -99,6 +177,13 @@ tr:nth-child(even) {
 
     function markChoreComplete(id){
         const req = new XMLHttpRequest();
+        req.onreadystatechange = function (){
+            if(this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+                location.reload();
+            } else if(this.readyState == XMLHttpRequest.DONE && this.status != 200) {
+                alert("Failed to mark as done - " + this.status);
+            }
+        }
         req.open("POST", "/update");
         req.setRequestHeader("Content-type", "application/json");
         req.send('{ "id" : "' + id + '" }');

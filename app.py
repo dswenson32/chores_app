@@ -21,7 +21,7 @@ def update():
     jsonObj = request.get_json()
     conn = get_db_connection()
     try:
-        query = "UPDATE chores SET last_performed=" + str(time.time()) + " WHERE id = " + jsonObj.get('id')
+        query = "UPDATE chores SET last_performed=" + str(round(time.time() * 1000)) + " WHERE id = " + jsonObj.get('id')
         print(query)
         conn.execute(query)
         conn.commit()
