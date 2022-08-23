@@ -53,11 +53,11 @@ tr:nth-child(even) {
 			<td>Daily </td>
 			<td>Complete </td>
 		</tr>
-        {% for chore in chores %}
+        {% for chore in chores|sort(attribute='last_performed') %}
             {% if chore['frequency'] == 'd' %}
             <tr>
                 <td>{{ chore['chore_name'] }} </td>
-                <td><input type="checkbox"/> </td>
+                <td><input type="button" id="{{ chore['id'] }}" value="Done"/> </td>
             </tr>
             {% endif %}
         {% endfor %}
@@ -71,11 +71,11 @@ tr:nth-child(even) {
 			<td>Weekly </td>
 			<td>Complete </td>
 		</tr>
-        {% for chore in chores %}
+        {% for chore in chores|sort(attribute='last_performed') %}
             {% if chore['frequency'] == 'w' %}
             <tr>
                 <td>{{ chore['chore_name'] }} </td>
-                <td><input type="checkbox"/> </td>
+                <td><input type="button" id="{{ chore['id'] }}" value="Done"/> </td>
             </tr>
             {% endif %}
         {% endfor %}
