@@ -1,4 +1,4 @@
-import sqlite3, time
+import sqlite3, time, json
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -16,17 +16,20 @@ def index():
     return render_template('test.html', chores=chores)
 
 # UPDATE
-@app.route('/update')
+@app.route('/update', methods = ["POST"])
 def update():
-    id = request.form.get("id")
+    jsonObj = request.get_json()
     conn = get_db_connection()
     try:
-        conn.execute('UPDATE chores SET last_performed=' + time.time() + 'WHERE id =' + id)
+        query = "UPDATE chores SET last_performed=" + str(time.time()) + " WHERE id = " + jsonObj.get('id')
+        print(query)
+        conn.execute(query)
+        conn.commit()
         conn.close()
         return "Success"
     except:
         conn.close()
-        return "Failure"
+        return "Failure", 500
 
 # DELETE
 # future implementation

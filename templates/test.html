@@ -57,7 +57,7 @@ tr:nth-child(even) {
             {% if chore['frequency'] == 'd' %}
             <tr>
                 <td>{{ chore['chore_name'] }} </td>
-                <td><input type="button" id="{{ chore['id'] }}" value="Done"/> </td>
+                <td><input type="button" class="completed-btn" id="{{ chore['id'] }}" value="Done"/> </td>
             </tr>
             {% endif %}
         {% endfor %}
@@ -75,7 +75,7 @@ tr:nth-child(even) {
             {% if chore['frequency'] == 'w' %}
             <tr>
                 <td>{{ chore['chore_name'] }} </td>
-                <td><input type="button" id="{{ chore['id'] }}" value="Done"/> </td>
+                <td><input type="button" class="completed-btn" id="{{ chore['id'] }}" value="Done"/> </td>
             </tr>
             {% endif %}
         {% endfor %}
@@ -86,4 +86,23 @@ tr:nth-child(even) {
 
 
 </body>
+
+<script>
+    const complete_buttons = document.querySelectorAll('.completed-btn');
+
+    complete_buttons.forEach( complete_button => {
+      complete_button.addEventListener('click', function handleClick(event) {
+        console.log('box clicked', event);
+        markChoreComplete(event.target.id)
+      });
+    });
+
+    function markChoreComplete(id){
+        const req = new XMLHttpRequest();
+        req.open("POST", "/update");
+        req.setRequestHeader("Content-type", "application/json");
+        req.send('{ "id" : "' + id + '" }');
+    }
+
+</script>
 </html>
