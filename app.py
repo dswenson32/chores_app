@@ -7,16 +7,16 @@ app = Flask(__name__)
 # Future implementation
 
 # READ
-@app.route('/')
+@app.route('/chores')
 def index():
     conn = get_db_connection()
     chores = conn.execute('SELECT * FROM chores').fetchall()
     conn.close()
     print("we did it")
-    return render_template('test.html', chores=chores)
+    return render_template('index.html', chores=chores)
 
 # UPDATE
-@app.route('/update', methods = ["POST"])
+@app.route('/chores/update', methods = ["POST"])
 def update():
     jsonObj = request.get_json()
     conn = get_db_connection()
